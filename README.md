@@ -67,7 +67,9 @@ Se hace con un stack tecnológico un poco mezclado
     (https://github.com/AlbertHernandez/express-typescript-service-template)
 
   - I am not going to use the template to generate it, I am goint to made by myselfe.
+
     - pnpm i -D typescript nodemon @types/node @types/express npm-run-all rimraf ts-node-dev
+    - pnpm i dotenv express
     - Create a tsconfig.json file
       - npx tsc --init --outDir dist/ --rootDir src
     - Create package.json scripts
@@ -75,7 +77,33 @@ Se hace con un stack tecnológico un poco mezclado
       - "build": "rimraf ./dist && tsc",
       - "start": "npm run build && node dist/app.js",
     - Create inicia project structure
+
       - src
         - main.ts
         - app
           - server.ts
+
+    - Enviroment vars.
+
+      - "./src/app/config/load-env-vars.ts
+
+        ```js
+        import { config } from "dotenv";
+        config();
+        ```
+
+      - "./src/app/config/config.ts
+
+        ```js
+        export const config = {
+          server: {
+            port: process.env.PORT || 3000,
+          },
+        };
+        ```
+
+      - ".env"
+
+      ```bash
+        PORT=3000
+      ```
