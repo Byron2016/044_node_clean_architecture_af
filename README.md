@@ -224,3 +224,177 @@ Se hace con un stack tecnológico un poco mezclado
         	  ....
         	}
         ```
+
+    - User Repository pattron.
+
+      - "./src/app/users/user.ts"
+
+        ```js
+        	export class User {
+        	  constructor(public readonly id: string, public readonly name: string) {}
+        	}
+        ```
+
+      - "./src/app/users/user-repository.ts"
+
+        ```js
+        import { User } from "./user";
+
+        export interface UserRepository {
+          getById(id: string): Promise<User | null>;
+        }
+        ```
+
+      - "./src/app/users/user-not-found.ts"
+
+        ```js
+        export class UserNotFound extends Error {
+          constructor(id: string) {
+            super(`User not found "${id}"`);
+          }
+        }
+        ```
+
+      - "./src/app/users/user-collection.ts"
+
+        ```js
+        import { User } from "./user";
+
+        export const USER_COLLECTION: User[] = [
+          {
+            id: "1",
+            name: "Santiago",
+          },
+          {
+            id: "2",
+            name: "Sofía",
+          },
+        ];
+        ```
+
+      - "./src/app/users/user-by-id-finder.ts"
+
+        ```js
+        import { error } from "console";
+        import { UserRepository } from "./user-repository";
+        import { UserNotFound } from "./user-not-found";
+        import { User } from "./user";
+
+        export class UserByIdFinder {
+          constructor(private readonly userRepository: UserRepository) {}
+
+          async run(id: string): Promise<User> {
+            const user = await this.userRepository.getById(id);
+
+            if (!user) {
+              throw new UserNotFound(id);
+            }
+
+            return user;
+          }
+        }
+        ```
+
+      - "./src/app/users/mongo-user-repository.ts"
+
+        ```js
+        import { User } from "./user";
+        import { USER_COLLECTION } from "./user-collection";
+        import { UserRepository } from "./user-repository";
+
+        export class MongoUserRepository implements UserRepository {
+          async getById(id: string): Promise<User | null> {
+            console.log("Using Mongo");
+
+            const user = USER_COLLECTION.find((user) => user.id === id);
+            return user ? new User(user.id, user.name) : null;
+          }
+        }
+        ```
+
+      - "./src/app/users/elastic-user-repository.ts"
+
+        ```js
+        import { User } from "./user";
+        import { USER_COLLECTION } from "./user-collection";
+        import { UserRepository } from "./user-repository";
+
+        export class ElasticUserRepository implements UserRepository {
+          async getById(id: string): Promise<User | null> {
+            console.log("Using Elastic");
+
+            const user = USER_COLLECTION.find((user) => user.id === id);
+            return user ? new User(user.id, user.name) : null;
+          }
+        }
+        ```
+
+      - "./src/app/users/user-controller.ts"
+
+        ```js
+        import { Request, Response } from "express";
+        import { StatusCodes } from "http-status-codes";
+        import { UserByIdFinder } from "./user-by-id-finder";
+        import { UserNotFound } from "./user-not-found"
+        export class UserController {
+          constructor(private readonly userByIdFinder: UserByIdFinder) {
+          async run(req: Request, res: Response) {
+            try {
+              const user = await this.userByIdFinder.run(req.params.id);
+              res.status(StatusCodes.OK).send(user);
+            } catch (error) {
+              if (error instanceof UserNotFound) {
+                res.status(StatusCodes.BAD_REQUEST).send();
+              }
+              res.status(StatusCodes.INTERNAL_SERVER_ERROR).send();
+            }
+          }
+        }
+        ```
+
+      - "./src/app/users/user-router.ts"
+
+        ```js
+        import express, { Router } from "express";
+        import { userController } from "./dependencies";
+
+        const userRouter = Router();
+
+        // bind para no perder el contexto del this.
+        userRouter.get("/:id", userController.run.bind(userController));
+
+        export { userRouter };
+        ```
+
+      - "./src/app/users/dependencies.ts"
+
+        ```js
+        import { ElasticUserRepository } from "./elastic-user-repository";
+        import { MongoUserRepository } from "./mongo-user-repository";
+        import { UserByIdFinder } from "./user-by-id-finder";
+        import { UserController } from "./user-controller";
+
+        const mongoUserRepository = new MongoUserRepository();
+
+        const userByIdFinder = new UserByIdFinder(mongoUserRepository);
+
+        export const userController = new UserController(userByIdFinder);
+        ```
+
+      - "./src/app/server.ts"
+
+        ```js
+        ....
+        import { userRouter } from "./users/user-router";
+
+        export class Server {
+          ....
+          constructor() {
+            ....
+            // routes
+            this.app.use("/api/health", healthRouter);
+            this.app.use("/users", userRouter);
+          }
+        	....
+        }
+        ```

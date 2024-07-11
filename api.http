@@ -8,6 +8,10 @@
 @modifiedBy = {{$processEnv USERNAME}}
 
 
-### GET
+### HEALTH
 ### 
 GET {{host}}/api/health
+
+### uSER
+### 
+GET {{host}}/users/2
