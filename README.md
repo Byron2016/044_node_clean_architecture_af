@@ -67,5 +67,15 @@ Se hace con un stack tecnológico un poco mezclado
     (https://github.com/AlbertHernandez/express-typescript-service-template)
 
   - I am not going to use the template to generate it, I am goint to made by myselfe.
-    - pnpm i -D typescript nodemon @types/node @types/express npm-run-all rimraf
-    -
+    - pnpm i -D typescript nodemon @types/node @types/express npm-run-all rimraf ts-node-dev
+    - Create a tsconfig.json file
+      - npx tsc --init --outDir dist/ --rootDir src
+    - Create package.json scripts
+      - "dev": "tsnd --respawn --clear src/app.ts",
+      - "build": "rimraf ./dist && tsc",
+      - "start": "npm run build && node dist/app.js",
+    - Create inicia project structure
+      - src
+        - main.ts
+        - app
+          - server.ts
