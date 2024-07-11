@@ -398,3 +398,21 @@ Se hace con un stack tecnológico un poco mezclado
         	....
         }
         ```
+
+    - User Repository pattron: Move to a new DB.
+
+      - "./src/app/server.ts"
+
+        ```js
+        import { ElasticUserRepository } from "./elastic-user-repository";
+        // import { MongoUserRepository } from "./mongo-user-repository";
+        ....
+
+        // const mongoUserRepository = new MongoUserRepository();
+
+        const elasticUserRepository = new ElasticUserRepository();
+
+        const userByIdFinder = new UserByIdFinder(elasticUserRepository);
+
+        export const userController = new UserController(userByIdFinder);
+        ```
