@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import http from "node:http";
 import { config } from "./config/config";
 import { AddressInfo } from "node:net";
+import { healthRouter } from "./health/api/health-router";
 
 export class Server {
   private readonly app: Express;
@@ -10,8 +11,10 @@ export class Server {
   constructor() {
     this.app = express();
     this.app.use(express.json());
-    // this.app.use()
-    // this.app.use()
+
+    // routes
+    this.app.use("/api/health", healthRouter);
+    // this.app.use();
   }
 
   async start(): Promise<void> {

@@ -1,0 +1,13 @@
+@hostname = http://localhost
+@port = 3000
+@token = 
+
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+@createdAt = {{$datetime iso8601}}
+@modifiedBy = {{$processEnv USERNAME}}
+
+
+### GET
+### 
+GET {{host}}/api/health

@@ -69,7 +69,7 @@ Se hace con un stack tecnológico un poco mezclado
   - I am not going to use the template to generate it, I am goint to made by myselfe.
 
     - pnpm i -D typescript nodemon @types/node @types/express npm-run-all rimraf ts-node-dev
-    - pnpm i dotenv express
+    - pnpm i dotenv express http-status-codes
     - Create a tsconfig.json file
       - npx tsc --init --outDir dist/ --rootDir src
     - Create package.json scripts
@@ -175,4 +175,52 @@ Se hace con un stack tecnológico un poco mezclado
         }
 
         process.on("uncaughtException", handleError);
+        ```
+
+    - Create health end point.
+
+      - "./src/app/health/api/health-controller.ts"
+
+        ```js
+        import { Request, Response } from "express";
+        import { StatusCodes } from "http-status-codes";
+
+        export class HealthController {
+          async run(req: Request, res: Response) {
+            res.status(StatusCodes.OK).send();
+          }
+        }
+        ```
+
+      - "./src/app/health/api/health-router.ts"
+
+        ```js
+        import express, { Router } from "express";
+        import { HealthController } from "./health-controller";
+
+        const healthRouter = Router();
+
+        const healthController = new HealthController();
+
+        healthRouter.get("/", healthController.run.bind(healthController));
+
+        export { healthRouter };
+        ```
+
+      - "./src/app/server.ts"
+
+        ```js
+        	....
+        	import { healthRouter } from "./health/api/health-router";
+
+        	export class Server {
+        	  ....
+        	  constructor() {
+        	    ....
+        	    // routes
+        	    this.app.use("/api/health", healthRouter);
+        	    // this.app.use();
+        	  }
+        	  ....
+        	}
         ```
