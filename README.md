@@ -107,3 +107,72 @@ Se hace con un stack tecnológico un poco mezclado
       ```bash
         PORT=3000
       ```
+
+    - Create express server.
+
+      - "./src/app/server.ts"
+
+        ```js
+        	import express, { Express } from "express";
+        	import http from "node:http";
+        	import { config } from "./config/config";
+        	import { AddressInfo } from "node:net";
+
+        	export class Server {
+        	  private readonly app: Express;
+        	  private httServer?: http.Server;
+
+        	  constructor() {
+        	    this.app = express();
+        	    this.app.use(express.json());
+        	    // this.app.use()
+        	    // this.app.use()
+        	  }
+
+        	  async start(): Promise<void> {
+        	    return new Promise((resolve) => {
+        	      this.httServer = this.app.listen(config.server.port, () => {
+        	        const { port } = this.httServer?.address() as AddressInfo;
+        	        console.log(`App is ready and listenig on port ${port} 🚀`);
+        	        resolve();
+        	      });
+        	    });
+        	  }
+
+        	  async stop(): Promise<void> {
+        	    return new Promise((resolve, reject) => {
+        	      if (this.httServer) {
+        	        this.httServer.close((err) => {
+        	          if (err) {
+        	            return reject(err);
+        	          }
+        	          return resolve();
+        	        });
+        	      }
+
+        	      return resolve();
+        	    });
+        	  }
+
+        	  getHttpServer(): http.Server | undefined {
+        	    return this.httServer;
+        	  }
+        	}
+        ```
+
+      - "./src/main.ts"
+
+        ```js
+        import "./app/config/load-env-vars";
+
+        import { Server } from "./app/server";
+
+        new Server().start().catch(handleError);
+
+        function handleError(err: unknown) {
+          console.error(err);
+          process.exit(1);
+        }
+
+        process.on("uncaughtException", handleError);
+        ```
