@@ -60,3 +60,12 @@ Se hace con un stack tecnológico un poco mezclado
 [⏪(Back to top)](#table-of-contents)
 
 # Steps
+
+- Create a base project with this template:
+
+  - [NodeJS Repository Pattern | Clean Architecture]
+    (https://github.com/AlbertHernandez/express-typescript-service-template)
+
+  - I am not going to use the template to generate it, I am goint to made by myselfe.
+    - pnpm i -D typescript nodemon @types/node @types/express npm-run-all rimraf
+    -
