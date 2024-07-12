@@ -419,14 +419,60 @@ Se hace con un stack tecnológico un poco mezclado
 
     - Transform to Hexagonal Architecture
 
-    | File               | Original        | Destination                                     |
-    | ------------------ | --------------- | ----------------------------------------------- |
-    | dependencies       | ./src/app/users | ./src/app/users/infraestructure                 |
-    | db-user-repository | ./src/app/users | ./src/app/users/infraestructure/user-repository |
-    | user-colletion     | ./src/app/users | ./src/app/users/infraestructure/user-repository |
-    | user-controller    | ./src/app/users | ./src/app/users/infraestructure/http            |
-    | user-router        | ./src/app/users | ./src/app/users/infraestructure/http            |
-    | user-not-found     | ./src/app/users | ./src/app/users/domain                          |
-    | user-repository    | ./src/app/users | ./src/app/users/domain                          |
-    | user               | ./src/app/users | ./src/app/users/domain                          |
-    | user-by-id-finder  | ./src/app/users | ./src/app/users/application                     |
+      | File               | Original        | Destination                                     |
+      | ------------------ | --------------- | ----------------------------------------------- |
+      | dependencies       | ./src/app/users | ./src/app/users/infraestructure                 |
+      | db-user-repository | ./src/app/users | ./src/app/users/infraestructure/user-repository |
+      | user-colletion     | ./src/app/users | ./src/app/users/infraestructure/user-repository |
+      | user-controller    | ./src/app/users | ./src/app/users/infraestructure/http            |
+      | user-router        | ./src/app/users | ./src/app/users/infraestructure/http            |
+      | user-not-found     | ./src/app/users | ./src/app/users/domain                          |
+      | user-repository    | ./src/app/users | ./src/app/users/domain                          |
+      | user               | ./src/app/users | ./src/app/users/domain                          |
+      | user-by-id-finder  | ./src/app/users | ./src/app/users/application                     |
+
+    - Obtain data base type from enviroment vars.
+
+      - ".env"
+        ```js
+          # "mongo" | "elastic" | "mySQL"
+          DB_TYPE="mongo"
+        ```
+      - "./src/app/config/config.ts"
+
+        ```js
+          export const config = {
+            ....
+            db: {
+              db_type: process.env.DB_TYPE || "mongo",
+            },
+          };
+        ```
+
+      - "./src/app/users/infraestructure/dependencies.ts"
+
+        ```js
+          ....
+          import { config } from "../../config/config";
+          import { UserRepository } from "../domain/user-repository";
+          import { MongoUserRepository } from "./user-repository/mongo-user-repository";
+          import { MySQLUserRepository } from "./user-repository/mysql-user-repository";
+
+          const getUserRepository = (): UserRepository => {
+            switch (config.db.db_type) {
+              case "mongo":
+                return new MongoUserRepository();
+              case "elastic":
+                return new ElasticUserRepository();
+              case "mySQL":
+                return new MySQLUserRepository();
+              default:
+                throw new Error("Invalid Database type");
+            }
+          };
+
+          const userByIdFinder = new UserByIdFinder(getUserRepository());
+
+          export const userController = new UserController(userByIdFinder);
+
+        ```
