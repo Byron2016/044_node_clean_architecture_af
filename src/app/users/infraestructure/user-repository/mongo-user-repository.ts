@@ -1,6 +1,6 @@
-import { User } from "./user";
+import { User } from "../../domain/user";
 import { USER_COLLECTION } from "./user-collection";
-import { UserRepository } from "./user-repository";
+import { UserRepository } from "../../domain/user-repository";
 
 export class MongoUserRepository implements UserRepository {
   async getById(id: string): Promise<User | null> {

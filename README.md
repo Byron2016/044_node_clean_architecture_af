@@ -416,3 +416,17 @@ Se hace con un stack tecnológico un poco mezclado
 
         export const userController = new UserController(userByIdFinder);
         ```
+
+    - Transform to Hexagonal Architecture
+
+    | File               | Original        | Destination                                     |
+    | ------------------ | --------------- | ----------------------------------------------- |
+    | dependencies       | ./src/app/users | ./src/app/users/infraestructure                 |
+    | db-user-repository | ./src/app/users | ./src/app/users/infraestructure/user-repository |
+    | user-colletion     | ./src/app/users | ./src/app/users/infraestructure/user-repository |
+    | user-controller    | ./src/app/users | ./src/app/users/infraestructure/http            |
+    | user-router        | ./src/app/users | ./src/app/users/infraestructure/http            |
+    | user-not-found     | ./src/app/users | ./src/app/users/domain                          |
+    | user-repository    | ./src/app/users | ./src/app/users/domain                          |
+    | user               | ./src/app/users | ./src/app/users/domain                          |
+    | user-by-id-finder  | ./src/app/users | ./src/app/users/application                     |

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { UserByIdFinder } from "./user-by-id-finder";
-import { UserNotFound } from "./user-not-found";
+import { UserByIdFinder } from "../../application/user-by-id-finder";
+import { UserNotFound } from "../../domain/user-not-found";
 
 export class UserController {
   constructor(private readonly userByIdFinder: UserByIdFinder) {}

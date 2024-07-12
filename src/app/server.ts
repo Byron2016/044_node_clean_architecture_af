@@ -3,7 +3,7 @@ import http from "node:http";
 import { config } from "./config/config";
 import { AddressInfo } from "node:net";
 import { healthRouter } from "./health/api/health-router";
-import { userRouter } from "./users/user-router";
+import { userRouter } from "./users/infraestructure/http/user-router";
 
 export class Server {
   private readonly app: Express;

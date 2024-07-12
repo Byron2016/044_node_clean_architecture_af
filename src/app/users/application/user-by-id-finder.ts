@@ -1,7 +1,7 @@
 import { error } from "console";
-import { UserRepository } from "./user-repository";
-import { UserNotFound } from "./user-not-found";
-import { User } from "./user";
+import { UserRepository } from "../domain/user-repository";
+import { UserNotFound } from "../domain/user-not-found";
+import { User } from "../domain/user";
 
 export class UserByIdFinder {
   constructor(private readonly userRepository: UserRepository) {}
